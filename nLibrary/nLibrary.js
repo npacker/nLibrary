@@ -1,43 +1,35 @@
 (function (window, document, undefined) {
 	
+	var _$ = window.$;
+	var nLibrary = window.nLibrary;
+	
 	var nLibrary = function (selector, context) {
 		return new nLibrary.ElementWrapper(selector, context);
+	};
+	
+	nLibrary.noConflict = function () {
+		window.$ = _$;
+		window.nLibrary = nLibrary;
+		
+		return nLibrary;
 	};
 	
 	nLibrary.ElementWrapper = function (selector, context) {
 		this.DOMElements = [];
 		this.selector;
 		
-		this.setDOMElements(selector, context);
+		if (typeof selector === 'object') {
+			this.concat([selector]);
+		}
+		
+		if (typeof selector === 'string') {
+			this.selector = new NSelector(selector, context, this);
+		} else {
+			this.selector = new NSelector();
+		}
 	};
 	
 	nLibrary.ElementWrapper.prototype = {
-		setDOMElements : function (selector, context) {
-			if (typeof selector === 'object') {
-				this.DOMElements = [selector];
-			}
-			
-			if (typeof selector === 'string') {
-				this.selector = new NSelector(selector, context, this);
-			}
-		},
-		
-		on : function (eventName, fn) {
-			var handler = function (event) {
-				fn.call(new nLibrary.ElementWrapper(event.target), new nLibrary.EventWrapper(event));
-			};
-			
-			this.each(function (DOMElement) {
-				if (typeof DOMElement.addEventListener  === 'function') {
-					DOMElement.addEventListener(eventName, handler, false);
-				} else if (typeof DOMElement.attachEvent === 'function') {
-					DOMElement.attachEvent(eventName, handler);
-				} else {
-					throw 'Event handler could not be bound.';
-				}
-			});
-		},
-		
 		addClass : function (name) {
 			var self;
 			
@@ -48,6 +40,21 @@
 					DOMElement.className = DOMElement.className.concat(' ' + name).trim();
 				}
 			});
+		},
+		
+		attr : function (attribute, value) {
+			if (attribute && value) {
+				this.each(function (DOMElement) {
+					DOMElement.setAttribute(attribute, value);
+				});
+			}
+			
+			try {
+				return this.DOMElements[0].getAttribute(attribute);
+			} catch(error) {
+				return undefined;
+			}
+			
 		},
 		
 		firstChildOfType : function (type) {
@@ -84,25 +91,79 @@
 			return result;
 		},
 		
+		id : function(id) {
+			var DOMElement;
+			
+			if (id) {
+				this.DOMElements[0].setAttribute('id', id);	
+			}
+					
+			try {
+				return this.DOMElements[0].getAttribute('id');
+			} catch(error) {
+				return undefined;
+			}		
+		},
+		
+		on : function (eventName, fn) {
+			var handler = function (event) {
+				fn.call(new nLibrary.ElementWrapper(event.target), new nLibrary.EventWrapper(event));
+			};
+			
+			this.each(function (DOMElement) {
+				if (typeof DOMElement.addEventListener  === 'function') {
+					DOMElement.addEventListener(eventName, handler, false);
+				} else if (typeof DOMElement.attachEvent === 'function') {
+					DOMElement.attachEvent(eventName, handler);
+				} else {
+					throw 'Event handler could not be bound.';
+				}
+			});
+		},
+		
+		removeAttr : function(attribute) {
+			this.each(function (DOMElement) {
+				DOMElement.removeAttribute(attribute);
+			});
+		},
+		
 		removeClass : function (name) {
 			var self;
 			
 			self = this;
 			
 			this.each(function (DOMElement) {
-				if (self.selector.hasClass(name, DOMElement)) {
-					DOMElement.className = DOMElement.className.replace(' ' + name, '');
-				} else {
-					DOMElement.className = DOMElement.className.replace(name, '');
-				}
+				DOMElement.className = DOMElement.className.replace(name, '').trim();
 			});
 		},
 		
 		style : function (style) {
-			for (property in style) {
+			if (style) {
+				for (var property in style) {
+					this.each(function (DOMElement) {
+						DOMElement.style[property] = style[property];
+					});
+				}	
+			}
+			
+			try {
+				return this.DOMElements[0].style;	
+			} catch(error) {
+				return undefined;
+			}			
+		},
+		
+		text : function (text) {
+			if (text) {
 				this.each(function (DOMElement) {
-					DOMElement.style[property] = style[property];
-				});
+					DOMElement.innerHTML = text;
+				});	
+			}
+			
+			try {
+				return this.DOMElements[0].innerHTML;
+			} catch(error) {
+				return undefined;
 			}
 		},
 		
@@ -111,7 +172,7 @@
 		},
 		
 		concat : function (array) {
-			this.DOMElements = this.DOMElements.concat(array);
+			this.DOMElements = array;
 		},
 
 		each : function (fn) {
@@ -158,7 +219,7 @@
 		},
 		
 		stopPropagation : function () {
-			if (typeof this.event.stopPropogation() === 'function') {
+			if (typeof this.event.stopPropogation === 'function') {
 				this.event.stopPropagation();	
 			}
 			
@@ -173,15 +234,19 @@
 		this.tokenizer = new NTokenizer();
 		
 		if (typeof selector === 'string') {
-			if (document.querySelector === 'function') {
-				this.DOMElements = document.querySelectorAll(selector);
+			if (typeof document.querySelectorAll === 'function') {
+				if (!context) {
+					context = document;
+				}
+				
+				this.DOMElements = context.querySelectorAll(selector);
 			} else {
 				this.select(selector, context);
 			}
 		}
 
 		if (result) {
-			result = result.concat(this.DOMElements);	
+			result = result.concat(this.DOMElements);
 		}
 	}
 	
@@ -190,6 +255,10 @@
 			var tokens;
 			var baseElements;
 			var baseToken;
+			
+			if (!context) {
+				context = document.body;
+			}
 			
 			tokens = this.tokenizer.tokenize(selector);
 			baseElements = [];
@@ -205,16 +274,14 @@
 				case 'CLASS':
 					baseElements = this.selectByClass(baseToken.match, context);
 					break;
-			}
-			
-			baseElement = this.parseSelector(baseSelector.pattern);			
+			}		
 			
 			foreach(selectors, function (token) {
-	
+				this.matchToken(token, element);
 			});
 		},
 		
-		matchToken : function (token, element) { // matches element? 
+		matchToken : function (token, element) { 
 			switch (pattern) {
 				case 'COMBINATOR':
 					this.getSearchStrategy(token.match);
@@ -276,6 +343,47 @@
 		matchesTag : function (tag, element) {
 			return (tag.toLowerCase() === element.tagName.toLowerCase());
 		},
+		
+		/*select : function (selector, context) {
+			var currentElement;
+			var currentSelector;
+			var elements;
+			var foundSelector;
+			var selectors;
+			var selectorsToFind;
+			var self;
+		
+			if (!context) {
+				context = document.body;
+			}
+
+			elements = context.getElementsByTagName('*');
+			selectors = selector.split(' ');
+			self = this;
+
+			foreach(elements, function (element) {
+				selectorsToFind = selectors.slice(0);
+				currentSelector = selectorsToFind.pop();
+				currentElement = element;
+				
+				while (currentElement && currentSelector) {
+					foundSelector = false;
+					
+					while (currentElement && !foundSelector) {
+						if (self.matchesSelector(currentSelector, currentElement)) {
+							foundSelector = true;
+							currentSelector = selectorsToFind.pop();
+						}
+						
+						currentElement = currentElement.parentElement;
+					}
+				}
+								
+				if (!currentSelector) {
+					self.DOMElements.push(element);
+				}
+			});
+		},*/
 	};
 	
 	function NTokenizer() {
@@ -324,8 +432,11 @@
 	};
 		
 	function foreach(array, fn) {
+		var index;
+		
 		for (var i = 0; i < array.length; ++i) {
-			fn(array[i]);
+			index = i;
+			fn(array[i], index);
 		}
 	}
 	
