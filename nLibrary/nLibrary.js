@@ -92,13 +92,11 @@
 		},
 		
 		id : function(id) {
-			var DOMElement;
-			
-			if (id) {
-				this.DOMElements[0].setAttribute('id', id);	
-			}
-					
 			try {
+				if (id) {
+					this.DOMElements[0].setAttribute('id', id);	
+				}
+				
 				return this.DOMElements[0].getAttribute('id');
 			} catch(error) {
 				return undefined;
