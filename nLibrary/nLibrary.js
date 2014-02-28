@@ -430,11 +430,8 @@
 	};
 		
 	function foreach(array, fn) {
-		var index;
-		
 		for (var i = 0; i < array.length; ++i) {
-			index = i;
-			fn(array[i], index);
+			fn(array[i], i);
 		}
 	}
 	
