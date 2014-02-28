@@ -1,7 +1,7 @@
 (function (window, document, undefined) {
 	
 	var _$ = window.$;
-	var nLibrary = window.nLibrary;
+	var _nLibrary = window.nLibrary;
 	
 	var nLibrary = function (selector, context) {
 		return new nLibrary.ElementWrapper(selector, context);
@@ -9,7 +9,7 @@
 	
 	nLibrary.noConflict = function () {
 		window.$ = _$;
-		window.nLibrary = nLibrary;
+		window.nLibrary = _nLibrary;
 		
 		return nLibrary;
 	};
