@@ -265,68 +265,6 @@
 			
 		},
 		
-		/*select : function (selector, context) {
-			var currentElement;
-			var currentSelector;
-			var elements;
-			var foundSelector;
-			var selectors;
-			var selectorsToFind;
-			var self;
-		
-			if (!context) {
-				context = document.body;
-			}
-
-			elements = context.getElementsByTagName('*');
-			selectors = selector.split(' ');
-			self = this;
-
-			foreach(elements, function (element) {
-				selectorsToFind = selectors.slice(0);
-				currentSelector = selectorsToFind.pop();
-				currentElement = element;
-				
-				while (currentElement && currentSelector) {
-					foundSelector = false;
-					
-					while (currentElement && !foundSelector) {
-						if (self.matchesSelector(currentSelector, currentElement)) {
-							foundSelector = true;
-							currentSelector = selectorsToFind.pop();
-						}
-						
-						currentElement = currentElement.parentElement;
-					}
-				}
-								
-				if (!currentSelector) {
-					self.DOMElements.push(element);
-				}
-			});
-		},
-		
-		matchesSelector : function (selector, element) {
-			var firstCharacter;
-			var match;
-			
-			firstCharacter = selector.charAt(0);
-			
-			if (firstCharacter === '*') {
-				match = true;
-			} else if (firstCharacter === '#') {
-				selector = selector.substr(1);
-				match = this.hasId(selector, element);
-			} else if (firstCharacter === '.') {
-				selector = selector.substr(1);
-				match = this.hasClass(selector, element);
-			} else {
-				match = this.matchesTag(selector, element);
-			}
-			
-			return match;
-		},*/
-		
 		hasClass : function (name, element) {
 			return ((' ' + element.className + ' ').indexOf(' ' + name + ' ') > -1);
 		},
