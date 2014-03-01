@@ -58,22 +58,41 @@
 			
 		},
 		
-		firstChildOfType : function (type) {
-			var childrenOfType = [];
-			var firstChildOfType;
+		childrenOfType : function (type) {
+			var childNodes;
+			var childrenOfType;
 			var wrapper;
 			
+			try {
+				childNodes = this.DOMElements[0].childNodes;			
+			} catch(error) {
+				return undefined;
+			}	
+			
+			childrenOfType = [];
 			wrapper = new nLibrary.ElementWrapper();
 			
-			this.each(function (DOMElement) {
-				firstChildOfType = DOMElement.getElementsByTagName(type)[0];
-				
-				if (firstChildOfType) {
-					childrenOfType.push(DOMElement);
+			foreach(childNodes, function (node) {
+				if (node.nodeName.toLowerCase() === type.toLowerCase()) {
+					childrenOfType.push(node);
 				}
 			});
 			
-			return wrapper.concat(childrenOfType);
+			wrapper.concat(childrenOfType);
+			
+			return wrapper;
+		},
+		
+		firstChildOfType : function (type) {
+			var firstChildOfType;
+			
+			try {
+				firstChildOfType = this.DOMElements[0].getElementsByTagName(type)[0];
+			} catch(error) {
+				return undefined;
+			}
+			
+			return new nLibrary.ElementWrapper(firstChildOfType);
 		},
 		
 		hasClass : function (name) {
