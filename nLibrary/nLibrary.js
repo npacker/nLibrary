@@ -15,6 +15,7 @@
 	};
 	
 	nLibrary.ElementWrapper = function (selector, context) {
+		this.addEventMethod;
 		this.DOMElements = [];
 		this.selector;
 		
@@ -104,18 +105,27 @@
 		},
 		
 		on : function (eventName, fn) {
-			var handler = function (event) {
+			var handler;
+			var self;
+			
+			self = this;
+			
+			handler = function (event) {
 				fn.call(new nLibrary.ElementWrapper(event.target), new nLibrary.EventWrapper(event));
 			};
 			
-			this.each(function (DOMElement) {
-				if (typeof DOMElement.addEventListener  === 'function') {
-					DOMElement.addEventListener(eventName, handler, false);
-				} else if (typeof DOMElement.attachEvent === 'function') {
-					DOMElement.attachEvent(eventName, handler);
+			if (!this.addEventMethod) {
+				if (typeof window.addEventListener  === 'function') {
+					this.addEventMethod = 'addEventListener';
+				} else if (typeof window.attachEvent === 'function') {
+					this.addEventMethod = 'attachEvent';
 				} else {
 					throw 'Event handler could not be bound.';
 				}
+			}
+			
+			this.each(function (DOMElement) {		
+				DOMElement[self.addEventMethod](eventName, handler, false);
 			});
 		},
 		
@@ -152,14 +162,26 @@
 		},
 		
 		text : function (text) {
+			var self;
+
+			self = this;
+			
+			if (!this.addTextMethod) {
+				if (typeof document.textContent === 'object') {
+					this.addTextMethod = 'textContent';
+				} else if (typeof document.innerText === 'object') {
+					this.addTextMethod = 'innerText';
+				}
+			}			
+			
 			if (text) {
 				this.each(function (DOMElement) {
-					DOMElement.innerHTML = text;
-				});	
+					DOMElement[self.addTextMethod] = text;
+				});
 			}
 			
 			try {
-				return this.DOMElements[0].innerHTML;
+				return this.DOMElements[0][this.addTextMethod];
 			} catch(error) {
 				return undefined;
 			}
