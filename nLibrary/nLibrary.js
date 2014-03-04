@@ -15,10 +15,6 @@
 	};
 	
 	nLibrary.ElementWrapper = function (selector, context) {
-		this.addEventMethod;
-		this.DOMElements = [];
-		this.selector;
-		
 		if (typeof selector === 'object') {
 			this.concat([selector]);
 		}
@@ -31,6 +27,14 @@
 	};
 	
 	nLibrary.ElementWrapper.prototype = {
+		addEventMethod : null,
+	
+		addTextMethod : null,	
+	
+		DOMElements : [],
+	
+		selector : null,
+		
 		addClass : function (name) {
 			var self;
 			
@@ -83,6 +87,28 @@
 			return wrapper;
 		},
 		
+		concat : function (array) {
+			var self;
+			var success;
+			
+			self = this;
+			success = true;
+			
+			foreach(array, function (element) {
+				try {
+					self.DOMElements.push(element);	
+				} catch(error) {
+					success = false;
+				}
+			});
+			
+			return success;
+		},
+		
+		each : function (fn) {
+			foreach(this.DOMElements, fn);
+		},
+		
 		firstChildOfType : function (type) {
 			var firstChildOfType;
 			
@@ -93,6 +119,10 @@
 			}
 			
 			return new nLibrary.ElementWrapper(firstChildOfType);
+		},
+		
+		get : function (index) {
+			return this.DOMElements[index];
 		},
 		
 		hasClass : function (name) {
@@ -127,8 +157,7 @@
 			var handler;
 			var self;
 			
-			self = this;
-			
+			self = this;	
 			handler = function (event) {
 				fn.call(new nLibrary.ElementWrapper(event.target), new nLibrary.EventWrapper(event));
 			};
@@ -170,14 +199,14 @@
 					this.each(function (DOMElement) {
 						DOMElement.style[property] = style[property];
 					});
-				}	
+				}
 			}
 			
 			try {
 				return this.DOMElements[0].style;	
 			} catch(error) {
 				return undefined;
-			}			
+			}	
 		},
 		
 		text : function (text) {
@@ -191,7 +220,7 @@
 				} else if (typeof document.innerText === 'object') {
 					this.addTextMethod = 'innerText';
 				}
-			}			
+			}		
 			
 			if (text) {
 				this.each(function (DOMElement) {
@@ -204,24 +233,10 @@
 			} catch(error) {
 				return undefined;
 			}
-		},
-		
-		get : function (index) {
-			return this.DOMElements[index];
-		},
-		
-		concat : function (array) {
-			this.DOMElements = array;
-		},
-
-		each : function (fn) {
-			foreach(this.DOMElements, fn);
-		},
+		},			
 	};
 	
 	nLibrary.EventWrapper = function (event) {
-		this.event;
-		
 		if (event) {
 			this.event = event;
 		} else if (window.event) {
@@ -249,6 +264,16 @@
 	};
 	
 	nLibrary.EventWrapper.prototype = {
+		bubbles : null,
+	
+		cancelable : null,
+		
+		currentTarget : null,
+		
+		event : null,
+	
+		type : null,
+		
 		initEvent : function () {
 			this.event.initEvent();	
 		},
@@ -269,7 +294,6 @@
 	};
 	
 	function NSelector(selector, context, result) {
-		this.DOMElements = [];
 		this.tokenizer = new NTokenizer();
 		
 		if (typeof selector === 'string') {
@@ -290,6 +314,10 @@
 	}
 	
 	NSelector.prototype = {
+		DOMElements : [],
+		
+		tokenizer : null,
+		
 		select : function (selector, context) {
 			var tokens;
 			var baseElements;
@@ -321,7 +349,7 @@
 		},
 		
 		matchToken : function (token, element) { 
-			switch (pattern) {
+			switch (token) {
 				case 'COMBINATOR':
 					this.getSearchStrategy(token.match);
 					break;
@@ -426,11 +454,13 @@
 	};
 	
 	function NTokenizer() {
-		this.selector;
-		this.tokens;
 	}
 	
 	NTokenizer.prototype = {
+		selector : null,
+		
+		tokens : [],
+		
 		tokenize : function (selector) {
 			var patterns = {
 				COMBINATOR: /^\s*([\s\>\~\+])\s*/,
@@ -471,7 +501,11 @@
 	};
 		
 	function foreach(array, fn) {
-		for (var i = 0; i < array.length; ++i) {
+		var length;
+		
+		length = array.length;
+		
+		for (var i = 0; i < length; ++i) {
 			fn(array[i], i);
 		}
 	}
