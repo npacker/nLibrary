@@ -56,7 +56,7 @@
 			
 			try {
 				return this.DOMElements[0].getAttribute(attribute);
-			} catch(error) {
+			} catch (error) {
 				return undefined;
 			}
 			
@@ -69,7 +69,7 @@
 			
 			try {
 				childNodes = this.DOMElements[0].childNodes;			
-			} catch(error) {
+			} catch (error) {
 				return undefined;
 			}	
 			
@@ -97,7 +97,7 @@
 			foreach(array, function (element) {
 				try {
 					self.DOMElements.push(element);	
-				} catch(error) {
+				} catch (error) {
 					success = false;
 				}
 			});
@@ -114,7 +114,7 @@
 			
 			try {
 				firstChildOfType = this.DOMElements[0].getElementsByTagName(type)[0];
-			} catch(error) {
+			} catch (error) {
 				return undefined;
 			}
 			
@@ -148,7 +148,7 @@
 				}
 				
 				return this.DOMElements[0].getAttribute('id');
-			} catch(error) {
+			} catch (error) {
 				return undefined;
 			}		
 		},
@@ -204,7 +204,7 @@
 			
 			try {
 				return this.DOMElements[0].style;	
-			} catch(error) {
+			} catch (error) {
 				return undefined;
 			}	
 		},
@@ -230,7 +230,7 @@
 			
 			try {
 				return this.DOMElements[0][this.addTextMethod];
-			} catch(error) {
+			} catch (error) {
 				return undefined;
 			}
 		},			
@@ -363,7 +363,7 @@
 			}
 		},
 		
-		getSearchStrategy : function(selector) {
+		getSearchStrategy : function (selector) {
 			
 		},
 		
