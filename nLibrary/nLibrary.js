@@ -142,7 +142,7 @@
 		
 		id : function(id) {
 			try {
-				if (id) {
+				if (typeof id === 'string') {
 					this.DOMElements[0].setAttribute('id', id);	
 				}
 				
