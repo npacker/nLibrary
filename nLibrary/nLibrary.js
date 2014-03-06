@@ -86,20 +86,14 @@
 		
 		concat : function (array) {
 			var self;
-			var success;
 			
 			self = this;
-			success = true;
 			
 			foreach(array, function (element) {
-				try {
-					self.DOMElements.push(element);	
-				} catch (error) {
-					success = false;
-				}
+				self.DOMElements.push(element);	
 			});
 			
-			return success;
+			return this;
 		},
 		
 		each : function (fn) {
@@ -191,19 +185,28 @@
 		},
 		
 		style : function (style) {
-			if (style) {
-				for (var property in style) {
+			switch (style) {
+				case 'string':
+					try {
+						return this.DOMElements[0].style[style];
+					} catch (error) {
+						return undefined;
+					}
+					break;
+				case 'object':
 					this.each(function (DOMElement) {
-						DOMElement.style[property] = style[property];
+						for (var property in style) {
+							DOMElement.style[property] = style[property];
+						}
 					});
-				}
+					break;
+				default:
+					try {
+						return this.DOMElements[0].style;
+					} catch (error) {
+						return undefined;
+					}
 			}
-			
-			try {
-				return this.DOMElements[0].style;	
-			} catch (error) {
-				return undefined;
-			}	
 		},
 		
 		text : function (text) {
