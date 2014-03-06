@@ -222,7 +222,7 @@
 				}
 			}		
 			
-			if (text) {
+			if (typeof text === 'string') {
 				this.each(function (DOMElement) {
 					DOMElement[self.addTextMethod] = text;
 				});
