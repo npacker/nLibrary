@@ -15,6 +15,11 @@
 	};
 	
 	nLibrary.ElementWrapper = function (selector, context) {
+		this.addEventMethod;
+		this.addTextMethod;
+		this.DOMElements = [];
+		this.selector;
+		
 		if (typeof selector === 'object') {
 			this.concat([selector]);
 		}
@@ -27,14 +32,6 @@
 	};
 	
 	nLibrary.ElementWrapper.prototype = {
-		addEventMethod : null,
-	
-		addTextMethod : null,	
-	
-		DOMElements : [],
-	
-		selector : null,
-		
 		addClass : function (name) {
 			var self;
 			
@@ -264,16 +261,6 @@
 	};
 	
 	nLibrary.EventWrapper.prototype = {
-		bubbles : null,
-	
-		cancelable : null,
-		
-		currentTarget : null,
-		
-		event : null,
-	
-		type : null,
-		
 		initEvent : function () {
 			this.event.initEvent();	
 		},
@@ -294,6 +281,7 @@
 	};
 	
 	function NSelector(selector, context, result) {
+		this.DOMElements = [];
 		this.tokenizer = new NTokenizer();
 		
 		if (typeof selector === 'string') {
@@ -314,10 +302,6 @@
 	}
 	
 	NSelector.prototype = {
-		DOMElements : [],
-		
-		tokenizer : null,
-		
 		select : function (selector, context) {
 			var tokens;
 			var baseElements;
@@ -454,13 +438,11 @@
 	};
 	
 	function NTokenizer() {
+		this.selector;
+		this.tokens = [];
 	}
 	
 	NTokenizer.prototype = {
-		selector : null,
-		
-		tokens : [],
-		
 		tokenize : function (selector) {
 			var patterns = {
 				COMBINATOR: /^\s*([\s\>\~\+])\s*/,
