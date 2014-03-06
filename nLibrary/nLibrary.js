@@ -132,6 +132,14 @@
 			return result;
 		},
 		
+		height : function () {
+			try {
+				return this.DOMElements[0].offsetHeight;
+			} catch (error) {
+				return undefined;
+			}
+		},
+		
 		id : function(id) {
 			try {
 				if (id) {
@@ -233,7 +241,15 @@
 			} catch (error) {
 				return undefined;
 			}
-		},			
+		},
+		
+		width : function () {
+			try {
+				return this.DOMElements[0].offsetWidth;
+			} catch (error) {
+				return undefined;
+			}
+		},
 	};
 	
 	nLibrary.EventWrapper = function (event) {
