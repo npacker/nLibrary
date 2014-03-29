@@ -193,7 +193,7 @@
 		},
 		
 		style : function (style) {
-			switch (style) {
+			switch (typeof style) {
 				case 'string':
 					try {
 						return this.DOMElements[0].style[style];
